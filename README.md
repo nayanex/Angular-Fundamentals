@@ -771,3 +771,381 @@ Note that the `mirror_url` parameter has a value of null. We won't be able to de
 ```
 
 That's it! You now have a complete Interface of the GitHub search API to use with your application.
+
+## To Import an Interface into Your Service
+
+Now that we have our service ready to go, we can import the interface we made in the previous task. When we do this, we can give the Service the shape of the expected output of our API call, and every component that we subsequently inject our Service into will be provided with that information as well. This will especially come in handy later when we are building out the views for our application.
+
+Let's go ahead and import the Interface into our Service.
+
+1. Open up your `git-search.service.ts` file in Visual Studio Code.
+
+2. Go ahead and open up your `git-search.ts` file (the file containing your interface) as well.
+
+3. Take a look at the top line of your `git-search.ts` file. You will see the following:
+
+```typescript
+export interface GitSearch {
+```
+
+Using the export statement in this fashion creates an export object with GitSearch as a parameter. It will need to be imported using curly braces in an import statement {}. Curly braces allow you to have multiple exports in the same file, and to import them separately on a single import statement.
+
+4. Let's add the import statement to the top line of git-search.service.ts.
+
+```typescript
+import { GitSearch } from './git-search'
+```
+
+As the git-search.ts file that implements the interface is in the same directory as the `git-search.service.ts` file, you can use the relative directory path `./` to indicate that the file is in the same directory. You also do not need to include the .ts extension on the end of the file as TypeScript assumes this. Note that the name of the interface in the import statement matches the name of the interface in the export statement in git-search.ts. As we are importing types using the curly braces {} syntax, you need to ensure that the names in the import match the names being exported.
+
+5. When you are finished, your service should now look like this:
+
+```typescript
+import { Injectable } from '@angular/core';
+import { GitSearch} from './git-search'
+@Injectable()
+export class GitSearchService {
+
+  constructor() { }
+
+}
+```
+
+Our interface is now imported into our service and ready to go.
+
+## To Create a Service Method
+
+In the previous task, we created a service and imported our GitSearch Interface. Since we have our service created and our interface imported into it, we are now going to do two things: prepare a method to be used within our service to access the GitHub API, and set up caching within that method. Caching within a service is relatively easy, and allows you to be able to save data to be used later, preventing subsequent API calls and allowing those repeated calls to be delivered much quicker.
+
+Note that at the end of this task we will have our method set up to be used, but it won't be talking to the API just yet. In the next lab we will be taking this method and adding the HttpClient to access the GitHub Search API.
+
+1. Open up your `git-search.service.ts` file.
+
+2. Above our constructor function, let's add an empty array to contain the cached values. This will set up a cache for our service the first time it is injected.
+
+```typescript
+import { Injectable } from '@angular/core';
+import { GitSearch } from './git-search'
+@Injectable()
+export class GitSearchService {
+    cachedValues: Array<{
+          [query: string]: GitSearch
+      }> = [];
+  constructor() {}
+}
+```
+
+You can see we went ahead and described the shape of the objects we are going to be storing inside of the array. In this case the key of each object in the array will be the query passed to the function - so it subsequently has a type of `string` - and the value which will be the actual output from the API - marked with the type of GitSearch, which is using our previously imported interface.
+
+3. Let's go ahead and add our method next.
+
+```typescript
+import { Injectable } from '@angular/core';
+import { GitSearch } from './git-search'
+@Injectable()
+export class GitSearchService {
+    cachedValues: Array<{
+        [query: string]: GitSearch
+    }> = [];
+  constructor() {}
+
+  gitSearch = (query: string) => {}
+}
+```
+
+The `gitSearch `function we have just created is scoped to the this variable of the service, so if we were referencing it from within the service we would reference `this.gitSearch`. Outside of the service, in other components, it would be referenced as `GitSearchService.gitSearch`.
+
+4. Next we are going to create a Promise within our function to get resolved by either the cache value or the API call value.
+
+```typescript
+gitSearch = (query: string) => {
+    let promise = new Promise((resolve, reject) => {})
+    return promise;
+  }
+```
+
+Note the two parameters of the Promise - resolve and reject. You will call resolve with successful data calls, whereas reject would be used for manual error handling.
+
+5. Inside of our promise, we want to add a check to see if we want to use the cached value instead of querying for the response.
+
+```typescript
+gitSearch = (query: string) => {
+    let promise = new Promise((resolve, reject) => {
+        if (this.cachedValues[query]) {
+            resolve(this.cachedValues[query])
+        }
+    })
+    return promise;
+}
+```
+
+This will check the array that we created earlier for cached values with the same search query as what is being currently searched. This will get returned immediately without querying the API.
+
+6. If a value isn't cached, we will want to return the call from the API. For now, we'll just put a direct resolve call into an else block.
+
+```typescript
+gitSearch = (query: string) => {
+    let promise = new Promise((resolve, reject) => {
+        if (this.cachedValues[query]) {
+            resolve(this.cachedValues[query])
+        }
+        else {
+            resolve("Placeholder");
+        }
+    })
+    return promise;
+}
+```
+
+Note: What we have demonstrated here is a very naive caching method that caches the values for the lifetime of the application instance. For long running applications or APIs where the return values could change frequently (i.e. stock price) this approach would be problematic. However, this approach could be extended - for example - by storing the time the query was last executed. The code could then check to see if the cached data was older than a predefined limit (say 10 minutes). If the cached data had expired, it could then be discarded, a new API call made, and the new data saved in the cache and returned.
+
+7. When you're finished, you should have something that looks like this:
+
+```typescript
+import { Injectable } from '@angular/core';
+import { GitSearch } from './git-search'
+@Injectable()
+export class GitSearchService {
+    cachedValues: Array<{
+          [query: string]: GitSearch
+    }> = [];
+    constructor() {}
+
+    gitSearch = (query: string) => {
+        let promise = new Promise((resolve, reject) => {
+            if (this.cachedValues[query]) {
+                resolve(this.cachedValues[query])
+            }
+            else {
+                resolve("Placeholder");
+            }
+        })
+        return promise;
+    }
+}
+```
+
+So now we have a service created, our methods ready, and our interfaces injected.
+
+## To Use HttpClient
+
+Now we are going to be adding the HttpClient to our GitHub Search service so that we can actually call the GitHub API and retrieve a result.
+
+In order to use the HttpClient, we first need to import it into our application.
+
+1. Open up your `app.module.ts` file.
+
+2. Import the `HttpClientModule` into your `app.module`
+
+```typescript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { AppComponent } from './app.component';
+import { HttpClientModule } from '@angular/common/http';
+```
+
+3. Add the `HttpClientModule` to your list of imports in the module.
+
+```typescript
+imports: [
+    BrowserModule,
+    HttpClientModule
+],
+```
+
+4. When you're finished, your `app.module.ts` should look like this:
+
+```typescript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { AppComponent } from './app.component';
+import { HttpClientModule } from '@angular/common/http';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    HttpClientModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+Now that we have enabled `HttpClient` in our application, we can import our `HttpClient` into our service and use it.
+
+5. Open up your `git-search.service.ts` file in Visual Studio Code.
+
+6. Add the following line to the import block at the top of your file:
+
+```typescript
+import { HttpClient } from '@angular/common/http';
+```
+
+This imports the HttpClient into your service.
+
+7. HttpClient will emit RxJS Observables by default. Since we are using Promises in this example, we will import a feature from RxJS will allow us to convert the Observable emitted by the HttpClient into a Promise.
+
+```typescript
+import 'rxjs/add/operator/toPromise';
+```
+
+**Note:** The import syntax is a little different than before. This particular syntax only adds the toPromise method to the Observable type without adding other methods that you may not need. This can help keep the size of your application as small as possible.
+
+8. Our service also needs to have an instance of the HttpClient type to use for the WebApi calls. To achieve this, we will ask the Angular infrastructure to inject HttpClient via the service constructor. One way to do this would be as follows
+
+```typescript
+import { Injectable } from '@angular/core';
+import { GitSearch } from './git-search';
+import { HttpClient } from '@angular/common/http';
+import 'rxjs/add/operator/toPromise';
+
+@Injectable()
+export class GitSearchService {
+  cachedValues: Array<{
+    [query: string]: GitSearch
+  }> = [];
+  private http: HttpClient
+  constructor(http: HttpClient) {
+      this.http = http
+  }
+```
+
+Within the constructor, we assign the value of http passed to the constructor to the private http member variable. If we had a large number of constructor parameters, writing this code over and over would be very repetitive. Fortunately the designers of TypeScript realized this and created a nice shorthand syntax:
+
+```typescript
+import { Injectable } from '@angular/core';
+import { GitSearch } from './git-search';
+import { HttpClient } from '@angular/common/http';
+import 'rxjs/add/operator/toPromise';
+
+@Injectable()
+export class GitSearchService {
+  cachedValues: Array<{
+    [query: string]: GitSearch
+  }> = [];
+  constructor(private http: HttpClient) {
+  }
+```
+
+In this version, the http member is declared as private as part of the constructor definition and this is the clue for the TypeScript transpiler to automatically create the `http` member and assign the value. As you can imagine, this saves keystrokes and repetitive code over time.
+
+9. Now, let's go ahead and add the http call to our Promise created earlier.
+
+```typescript
+import { Injectable } from '@angular/core';
+import { GitSearch } from './git-search';
+import { HttpClient } from '@angular/common/http';
+import 'rxjs/add/operator/toPromise';
+
+@Injectable()
+export class GitSearchService {
+  cachedValues: Array<{
+    [query: string]: GitSearch
+  }> = [];
+  constructor(private http: HttpClient) {}
+
+  gitSearch = (query) => {
+    let promise = new Promise((resolve, reject) => {
+        if (this.cachedValues[query]) {
+            resolve(this.cachedValues[query])
+        }
+        else {
+            this.http.get('https://api.github.com/search/repositories?q=' + query)
+        }
+    })
+    return promise;
+  }
+}
+```
+
+Note that we have concatenated our query param onto the end of our API call.
+
+10. Next, we're going to chain a call to `.toPromise()` onto the end of the http call, to convert the Observable into a Promise. Remember we can only do this because we imported toPromise earlier.
+
+```typescript
+else {
+    this.http.get('https://api.github.com/search/repositories?q=' + query)
+    .toPromise()
+}
+```
+
+11. Now we need to chain a `.then()` method to deal with the response from the call.
+
+```typescript
+else {
+    this.http.get('https://api.github.com/search/repositories?q=' + query)
+    .toPromise()
+    .then( (response) => {
+        resolve(response)
+    }, (error) => {
+        reject(error);
+    })
+}
+```
+
+Note that we are resolving the original promise we created with the result from the promise generated by the API call. Promises enable you to do that - use other promise resolutions to resolve them. Note that we have also included a second function callback to `.then()` to handle any errors that occur by rejecting the promise with the returned error.
+
+Finally, to correctly identify the response with TypeScript, we need to annotate our method to include the proper types. In this case, our function is taking in a string and it's going to be returning a Promise with a return value that is a GitSearch - `Promise<GitSearch>`. We also need to mark that the response will have the shape of GitSearch by using the type assertion response as `GitSearch`. Update the function to match:
+
+```typescript
+gitSearch = (query: string): Promise<GitSearch> => {
+    let promise = new Promise<GitSearch>((resolve, reject) => {
+        if (this.cachedValues[query]) {
+            resolve(this.cachedValues[query])
+        }
+        else {
+            this.http.get('https://api.github.com/search/repositories?q=' + query)
+            .toPromise()
+            .then( (response) => {
+                resolve(response as GitSearch)
+            }, (error) => {
+                reject(error);
+            })
+        }
+    })
+    return promise;
+}
+```
+
+13. When you are finished, your service should look like this:
+
+```typescript
+import { Injectable, Inject } from '@angular/core';
+import { GitSearch } from './git-search';
+import { HttpClient } from '@angular/common/http';
+import 'rxjs/add/operator/toPromise';
+
+@Injectable()
+export class GitSearchService {
+  cachedValues: Array<{
+    [query: string]: GitSearch
+  }> = [];
+  constructor(private http: HttpClient) {
+      
+  }
+
+  gitSearch = (query: string): Promise<GitSearch> => {
+    let promise = new Promise<GitSearch>((resolve, reject) => {
+        if (this.cachedValues[query]) {
+            resolve(this.cachedValues[query])
+        }
+        else {
+            this.http.get('https://api.github.com/search/repositories?q=' + query)
+            .toPromise()
+            .then( (response) => {
+                resolve(response as GitSearch)
+            }, (error) => {
+                reject(error);
+            })
+        }
+    })
+    return promise;
+  }
+}
+```
+
+Great! We now have a completed service ready to use. In our next task, we're going to call the service, and see the result.
