@@ -1149,3 +1149,166 @@ export class GitSearchService {
 ```
 
 Great! We now have a completed service ready to use. In our next task, we're going to call the service, and see the result.
+
+## To Consume Services
+
+Since we have a completed service ready to use, now we are going to consume that service in our front-end application, call the API, and display a result.
+
+1. First let's add our service to our application. To do this, open up your `app.module.ts` file and import your service into it.
+
+```typescript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { AppComponent } from './app.component';
+import { GitSearchService } from './git-search.service';
+```
+
+2. Next, inside the providers array we will add our service. When you're done, your `app.module.ts` should look like this.
+
+```typescript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { AppComponent } from './app.component';
+import { GitSearchService } from './git-search.service';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    HttpClientModule
+  ],
+  providers: [GitSearchService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+By adding `GitSearchService` to the providers array, we are telling Angular that it is a dependency. This makes `GitSearchService` available to be injected into other components as needed.
+
+3. Open up the `app.component.t`s file in your `angular-fundamentals/app/src` directory. It should look like this:
+
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'GitHub Browser';
+}
+```
+
+4. We need to import our service to it. Add the following line to the import block at the top of the file:
+
+```typescript
+import { GitSearchService } from './git-search.service';
+```
+
+5. We also need to add a new import to our Angular Core imports, `OnInit`. This provides what is called a Lifecycle Hook, to execute code when the component is first rendered. Add `OnInit` to your Angular Core import like so:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { GitSearchService } from './git-search.service';
+```
+
+6. In order to use the `OnInit` lifecycle hook, you need to add an implements statement in your class statement, and add a method for `ngOnInit()`
+
+```typescript
+export class AppComponent implements OnInit {
+  ngOnInit() {
+    
+  }
+  title = 'GitHub Browser';
+}
+```
+
+The `implements` keyword extends a class with another one - in this case adding OnInit to your component class.
+
+7. We need to add a constructor function that allows our `GitSearchService` to be passed into the class. We declare it as a private member so it will be available via the this property.
+
+Note that adding `GitSearchService` to the constructor declares it as a dependency that the Angular infrastructure needs to satisfy. As we added GitSearchService to the providers array earlier, Angular will automatically pass an instance of the `GitSearchService` to our component.
+
+```typescript
+export class AppComponent implements OnInit {
+  constructor(private GitSearchService: GitSearchService) {
+
+  }
+
+  ngOnInit() {
+
+  }
+  title = 'GitHub Browser';
+}
+```
+
+8. Next, we are going to add our call to our service inside the ngOnInit hook.
+
+```typescript
+ngOnInit() {
+    this.GitSearchService.gitSearch('angular').then( (response) => {
+      alert("Total Libraries Found:" + response.total_count);
+    }, (error) => {
+      alert("Error: " + error.statusText)
+    })
+}
+```
+
+We are passing the search term `angular` into the `gitSearch` function that is part of `GitSearchService`. As this function returns a promise we can use a `.then()` method to respond to the promise's resolution, in this case displaying an alert that tells us the total count of results available. We have also added an error handler function afterwards to display an alert of the text description of the HTTP status if the HTTP call fails.
+
+Your `app.component.ts` file should look something like this:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { GitSearchService } from './git-search.service';
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
+  providers: [GitSearchService]
+})
+export class AppComponent implements OnInit {
+  constructor (private GitSearchService : GitSearchService) {
+
+  }
+  ngOnInit() {
+    this.GitSearchService.gitSearch('angular').then( (response) => {
+      alert("Total Libraries Found:" + response.total_count);
+    }, (error) => {
+      alert("Error: " + error.statusText);
+    })
+  }
+  title = 'app is functional!';
+}
+```
+
+9. Save all files, and open up a command prompt or terminal.
+
+10. Navigate to your `angular-fundamentals` folder.
+
+11. Type `ng serve`.
+
+12. Once the app has compiled and started, open up your browser and navigate to l`ocalhost:4200`. You should see the following:
+
+![alt text](https://prod-edxapp.edx-cdn.org/assets/courseware/v1/def1c0fc6234eaa5380a3850d126e29a/asset-v1:Microsoft+DEV314x+1T2019a+type@asset+block/M2L08result.png)
+
+13. Now that you've seen a successful call, let's demonstrate an error. Change your gitSearch parameter to the following and save your file.
+
+```typescript
+this.GitSearchService.gitSearch('&&&&&').then( (response) => {
+  alert("Total Libraries Found:" + response.total_count);
+}, (error) => {
+  alert("Error: " + error.statusText);
+})
+```
+
+14. When the app has compiled and started, navigate to localhost:4200 and you should see this instead:
+
+![alt text](https://prod-edxapp.edx-cdn.org/assets/courseware/v1/fdd7637a971578f0cb4cd8b9c59c2f04/asset-v1:Microsoft+DEV314x+1T2019a+type@asset+block/error.png)
+
+And there you have it! You have successfully used the HttpClient module to access data from an API in your Angular app. You have seen how to handle both the success and failure of such a call using a promise. 
