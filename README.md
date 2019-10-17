@@ -188,7 +188,6 @@ Once you have imported the module, you can make use of it in your own component.
 import { Injectable } from '@angular/core';
 import { GitSearch } from './git-search';
 import { HttpClient } from '@angular/common/http';
-import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class GitSearchService {
@@ -989,19 +988,12 @@ This imports the HttpClient into your service.
 
 7. HttpClient will emit RxJS Observables by default. Since we are using Promises in this example, we will import a feature from RxJS will allow us to convert the Observable emitted by the HttpClient into a Promise.
 
-```typescript
-import 'rxjs/add/operator/toPromise';
-```
-
-**Note:** The import syntax is a little different than before. This particular syntax only adds the toPromise method to the Observable type without adding other methods that you may not need. This can help keep the size of your application as small as possible.
-
 8. Our service also needs to have an instance of the HttpClient type to use for the WebApi calls. To achieve this, we will ask the Angular infrastructure to inject HttpClient via the service constructor. One way to do this would be as follows
 
 ```typescript
 import { Injectable } from '@angular/core';
 import { GitSearch } from './git-search';
 import { HttpClient } from '@angular/common/http';
-import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class GitSearchService {
@@ -1020,7 +1012,6 @@ Within the constructor, we assign the value of http passed to the constructor to
 import { Injectable } from '@angular/core';
 import { GitSearch } from './git-search';
 import { HttpClient } from '@angular/common/http';
-import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class GitSearchService {
@@ -1039,7 +1030,6 @@ In this version, the http member is declared as private as part of the construct
 import { Injectable } from '@angular/core';
 import { GitSearch } from './git-search';
 import { HttpClient } from '@angular/common/http';
-import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class GitSearchService {
@@ -1064,7 +1054,7 @@ export class GitSearchService {
 
 Note that we have concatenated our query param onto the end of our API call.
 
-10. Next, we're going to chain a call to `.toPromise()` onto the end of the http call, to convert the Observable into a Promise. Remember we can only do this because we imported toPromise earlier.
+10. Next, we're going to chain a call to `.toPromise()` onto the end of the http call, to convert the Observable into a Promise.
 
 ```typescript
 else {
@@ -1117,7 +1107,6 @@ gitSearch = (query: string): Promise<GitSearch> => {
 import { Injectable, Inject } from '@angular/core';
 import { GitSearch } from './git-search';
 import { HttpClient } from '@angular/common/http';
-import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class GitSearchService {
@@ -1312,3 +1301,12 @@ this.GitSearchService.gitSearch('&&&&&').then( (response) => {
 ![alt text](https://prod-edxapp.edx-cdn.org/assets/courseware/v1/fdd7637a971578f0cb4cd8b9c59c2f04/asset-v1:Microsoft+DEV314x+1T2019a+type@asset+block/error.png)
 
 And there you have it! You have successfully used the HttpClient module to access data from an API in your Angular app. You have seen how to handle both the success and failure of such a call using a promise. 
+
+
+
+
+
+
+
+
+`ng generate interface git-users`

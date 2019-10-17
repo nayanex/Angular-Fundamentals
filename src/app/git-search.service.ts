@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GitSearch } from './git-search';
+import { GitUsers } from './git-users';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -27,6 +28,19 @@ export class GitSearchService {
           reject(error);
         })
       }
+    })
+    return promise;
+  }
+
+  gitUsers = (query: String): Promise<GitUsers> => {
+    let promise = new Promise<GitUsers>((resolve, reject) => {
+      this.http.get('https://api.github.com/search/users?q=' + query)
+      .toPromise()
+      .then( (response) => {
+        resolve(response as GitUsers)
+      }, (error) => {
+        reject(error);
+      })
     })
     return promise;
   }
