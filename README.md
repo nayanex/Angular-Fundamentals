@@ -92,6 +92,8 @@ Let's go ahead and instantiate a scaffold with the Angular CLI.
 
 `ng new angular-fundamentals`
 
+*OBS:* for styles choose `.css`
+
 ## To Generate a Module using the Angular CLI
 
 
@@ -1303,10 +1305,487 @@ this.GitSearchService.gitSearch('&&&&&').then( (response) => {
 And there you have it! You have successfully used the HttpClient module to access data from an API in your Angular app. You have seen how to handle both the success and failure of such a call using a promise. 
 
 
+# Generate git-users Interface
 
-
-
-
-
+1. Create a new interface for searching users in GitHub called [git-users](https://developer.github.com/v3/search/#search-users). [Sample Call](https://api.github.com/search/users?q=tom)
 
 `ng generate interface git-users`
+
+2. Create a new method in your existing service to search for users.
+
+```typescript
+gitUsers = (query: String): Promise<GitUsers> => {
+    let promise = new Promise<GitUsers>((resolve, reject) => {
+      this.http.get('https://api.github.com/search/users?q=' + query)
+      .toPromise()
+      .then( (response) => {
+        resolve(response as GitUsers)
+      }, (error) => {
+        reject(error);
+      })
+    })
+    return promise;
+}
+```
+
+3. Consume that new method in your application.
+
+We found a why to call this service method in our `app.componennt.ts`
+
+```typescript
+this.GitSearchService.gitUsers('tom').then( (response) => {
+      alert("Total Users Found:" + response.total_count);
+    }, (error) => {
+      alert("Error: " + error.statusText)
+    })
+}
+```
+
+# Components
+
+A component is responsible for controlling a view, or a part of the screen. You create a class to hold the application logic that forms part of the component.
+
+Angular follows the MVC architecture which stands for Model-View-Controller. The Model portion contains application data. The View is the user interface (UI) or the web page that a user interacts with. The Controller handles the interaction and communication between the View and the Model. In Angular, your component will interact with the view through an application programming interface (API). The APIs consist of properties and methods to act on those properties, or provide some functionality.
+
+One of the most noteworthy and useful features of the Angular architecture is the usage of reusable components to display data. By using an Angular Component, you can couple data display logic, styles, and HTML into one container that's easily portable throughout your application.
+
+An Angular component consists of a template, that is the view or “a” view layout for a portion of your web application. The template consists of HTML for the layout and is used to define the rendered content on the page.
+
+The Angular code that you will add to this HTML is responsible for setting the bindings to data and the directives within the HTML that provides the dynamic aspects of an angular component.
+
+Angular also makes use of a class file to contain code that supports the view in the template. Typically this class file will be created in TypeScript and will contain the properties and methods that will be used by your application.
+
+You will also find metadata in the component, which is used to provide additional information about your component to Angular. Metadata is defined using decorators. You will find out how to use these aspects in this module.
+
+## Generate Components
+
+You'll typically have a top-level component in your Angular application. In the tutorial labs, you will work on building a top-level component called `git-search`. The Angular CLI command is `ng generate` component which is followed by the component name you want to use such as `ng generate component git-search`.
+
+This will result in a new folder structure being created in your Angular app's root folder. The folder structure will be `/src/app/git-search` in this instance. Within this folder, a number of files will be created:
+
+1. a typescript file with the .ts extension to contain the logic for the component
+2. a CSS file that is injected into the component for specifying styling using CSS for the component
+3. an HTML file that will contain the view template
+4. a Karma test file with the .spec.ts extension, in the event you want to implement Karma testing
+When you open the `.ts` file, you will find these common aspects as a part of the component:
+
+```typescript
+import { Component } from @angular/core
+```
+
+Import statements are used to access functionality in other code such as libraries and other classes. This line is responsible for importing the Component Object from the `@angular/core` library. This is one of the main libraries used in Angular.
+
+```typescript
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
+  title: string = 'Page Title';
+}) 
+```
+
+This is segment where you define your component. The `@` is a TypeScript symbol that helps us describe an Angular directive. In this case, `@Component` is a directive that tells Angular we wish to create a new component.
+
+`@Component` is also known as a decorator. A decorate in Angular is prefixed with an `@` symbol and is considered a mechanism to add metadata to a class, to the members of a class, or to method arguments of a class. You place the decorator before your class name, ie before the export statement. Angular has several built-in decorators and you will get a change to use some of them in this course.
+
+Within the `@Component` body, we see a `selector`, `templateUrl`, and `styleUrl` entries with some values assigned. Let's cover each of these so you understand their purpose.
+
+* `selector` - this specifies the name of an HTML tag that will contain this component when the application is running. In the HTML, you will find `<app-root></app-root>` tags for this component
+* `templateUrl` - using this option allows you to specify a template that will contain the HTML for this component. You could also opt to use the template: option and specify “inline” HTML right in the body of the component.
+* `styleUrls` - this links to an external CSS style sheet that will be applied to the component's HTML rendering
+
+There are other options available for the component and you can browse the Angular documentation for additional options and instructions on using them.
+
+Everything found within the `@Component` section is considered to be metadata and template information for this component. Obviously the template information consists of the HTML elements that may be found within the component. In this instance, we are using a URL to define the template rather than placing the HTML inline in the component.
+
+Next we set up an export statement like this:
+
+```typescript
+export class AppComponent implements OnInit
+```
+
+The `export` keyword is what allows your component to be available to be imported into other files in the project. The `class` keyword identifies this as a class file so if you are familiar with object-oriented programming, then you will understand that class is a keyword used to identify a file that contains the “blueprint” information for a reusable component.
+
+The AppComponent identifier is the class name. It will be the name you use within an import statement in other areas of your application and offers a clear identifer for this class.
+
+The last keyword, `implements`, will not always be present on all components. In this case, it indicates that our `AppComponent` class will also implement functionality that is specified in another component or interface, known as `OnInit`. We won't talk about interfaces here but again, it is an object-oriented programming concept that is used to specify behavior of a class file based on behaviors defined in another file.
+
+Also, this is where we define any variables or functions that the component will consist of. We can see an example here:
+
+```typescript
+constructor (private GitSearchService : GitSearchService) {
+    
+  }
+  ngOnInit() {
+    this.GitSearchService.gitSearch('angular').then( (response) => {
+      alert("Total Libraries Found:" + response.total_count);
+    }, (error) => {
+      alert("Error: " + error.statusText)
+    })
+  }
+  title = 'GitHub Browser';
+```
+
+Here we setup a constructor, implement the `ngOnInit()` method, and set a title for the component.
+
+## Binding Data
+
+Binding is the term used to describe how the data for our application is “connected” to the user interface. If we step back and review the MVC architecture again, we noted that the Model was defined as the data, the View as the UI, and the Controller as the application logic but also as the communicator between the data and the UI.
+
+So, binding is responsible for the communication between our data and our UI. Our data can reside in a back-end database running on a server or it could be as simple as a flat file, such as a JSON file, that contains the data we want to use in our application.
+
+Binding allows us to pass the data into the UI through the use of properties, in the class that defines our Model, and the use of directives, which make use of a concept known as interpolation. Interpolation is the mechanism used to represent a placeholder, in your template, for the data that will be displayed.
+
+So, in summary, binding is the mechanism used to tie the data to the UI for display.
+
+In order to bind data to a template in Angular, you need to have that data available. For now, we will focus on using data that is part of an Angular component. That is, we will make use of the properties of our Angular component and bind them to UI elements in our template.
+
+See bellow an example of a component with properties:
+
+```typescript
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
+  title: string = 'Page Title';
+})
+```
+
+`selector:`, `templateUrl:`, `styleUrls:`, and `title:` are examples of properties for this component. The one that we will be most concerned with for this binding is the `title:` property. It is one that has a type specified (string) and a value after the `=` sign (‘Page Title’).
+
+There are four types of binding that we can do in Angular:
+
+* interpolation binding
+* property binding
+* event binding
+* two-way binding.
+
+### Interpolation Binding 
+
+Interpolation binding is accomplished using the interpolation syntax, also known as the moustache, where we place the data property into the HTML by using the double curly braces, {{title}}.
+
+<h1>{{title}}</h1>
+
+### Property Binding 
+
+Here is an example of doing the same thing with property binding. Note the syntax is a bit different than you might be used to when dealing with HTML attributes. We use square brackets to surround the HTML attribute, then use the data property in single quotes after the `=` sign.
+
+<h1 [innerHTML] = 'title'></h1>
+
+### Event Binding
+
+Event binding is accomplished when we associate an event with a method in our class. For example, we might want to take a specific action in our class when the user clicks a button. In this case, we would use the syntax of"
+
+<button (click) = 'toggleFlag()'>
+
+In the above code, we surround the click event attribute of the button element in parentheses and supply the method name in our class, that will handle the event, in single quotes.
+
+### Two-way Binding
+
+Two-way binding allows us to create interactivity or to update our data when the user takes an action with the UI. An example might be a list of products displayed from the data source and then using an input element to allow the user to filter the data displayed based on the value in the input. Sample code here shows using mgModel to achieve two-way binding.
+
+<input [(ngModel)] = 'filter'>
+
+These are just simple examples of binding properties or methods from our class to an element in the HTML template. We can also make use of various Angular directives and logic to bind multiple values, such as those that might exist in a database, and create tables on the fly to display these values. Angular binding offers an efficient way to display the data in your application. In the lab for this module, you will use simple binding.
+
+## Pipes
+
+A pipe allows you to use data, as an input to the pipe, and transform it to a more desirable output. As we think about our Angular applications, perhaps the most common reason for creating the application is to access and display data in our web applications. However, the data may be somewhat cryptic or not necessarily “user friendly” as in a data format.
+
+Often times a date may come to in the form:
+
+`Sat Jun 20 2017 04:00:00 GMT -0800 (Pacific Standard Time)`
+
+While it is readable to a certain degree, not every user cares about the time, or the offset. Perhaps you want to display this in a different format that expands the month rather than using an abbreviation, or perhaps, you want to switch the day and month around to support a different locale. Pipes help you accomplish this.
+
+Angular actually has a collection of built-in pipes for common tasks such as DatePipe, UpperCasePipe, LowerCasePipe, and CurrencyPipe. You can find out more about these in the API documentation for Angular. You will make use of the DatePipe and UpperCasePipe in the tutorial labs for this module.
+
+## Using Pipes
+
+Pipes are a concept in Angular that takes data and applies a transformation to it before sending it to the template to be rendered. This can be particularly useful for formatting purposes where consistent data transformations need to be applied to your data.
+
+If you are familiar with command-line or shell environments in operating systems, you may also be familiar with the pipe symbol `|`. In the command-line environments, this pipe symbol is used to send the output from one command to another command. Likewise, in Angular, we are going to use the pipe symbol to transform the data in our template, by passing it through a pipe to a transformation.
+
+In this code sample, taken from the labs, we will demonstrate applying the built-in date pipe to an Angular binding. The way we accomplish this is to add the pipe or | character after the Angular binding, followed by the built-in pipe command. The command we use here is `date:'fullDate'` to indicate a format of full date. See the code sample below:
+
+```html
+<div *ngIf="searchResults; else elseBlock">
+  ... 
+      <p class="description"> {{result.description}}</p> 
+      <p> Created On: {{result.created_at | date:'fullDate'}} </p>
+    </li>
+  </ul>
+</div>
+<ng-template #elseBlock>Loading...</ng-template>
+```
+
+## Directives
+
+Angular directives are responsible for providing functionality in an Angular application and help transform the Document Object Model (DOM).
+
+When you implement directives in your Angular application, you will use one of two types, structural directives or attribute directives.
+
+Structural directives are what you use to modify the layout of the page by manipulating the DOM. An attribute directive will merely alter the behavior or appearance of an existing DOM element.
+
+### Structural Directives
+
+As we noted in the introduction to directives topic, structural directives manipulate the HTML layout through the DOM. The manipulation comes in the form of either adding, removing, or changing an element. You know you are using a structural directive if the name is preceded by an asterisk such as *ngIf.
+
+The *ngIf directive is a built-in directive that comes “out-of-the=box” with Angular. So what do we use it for?
+
+Well, the keyword “if” that is contained in the directive should give you some idea. This directive will evaluate a boolean expression and based on the result, it either shows or hides an HTML element, as in the following example.
+
+```html
+<p *ngIf="true">
+   If the expression is true and ngIf is true, this content is displayed in the DOM.
+</p>
+<p *ngIf="false">
+    If the expression is false and ngIf is false, this content will NOT be displayed in the DOM.
+</p>
+```
+
+### Attribute Directives
+
+Recall from the introductory topic, attribute directives are responsible for changing the appearance of the element they are attached to rather than creating or removing elements like the structural directives do.
+
+Angular also has some built-in attribute directives that you can use, if you prefer to not create custom attribute directives. Perhaps one of the most commonly used is the ngClass attribute directive.
+
+The ngClass directive is designed to allow you to dynamically apply CSS to an element. The directive uses an expression to evaluate the CSS to apply. An example will illustrate this better.
+
+```html
+<p ng-class="{strike: deletedText, bold: important, 'has-error': highlight}">Sample Text</p>
+<label>
+   <input type="checkbox" ng-model="deletedText">
+   Strike Through for Deleted Text (apply the "strike" class)
+</label><br>
+<label>
+   <input type="checkbox" ng-model="important">
+   Important Text (apply the "bold" class)
+</label><br>
+<label>
+   <input type="checkbox" ng-model="error">
+   Show Where an Error Is (apply the "has-error" class)
+</label>
+```
+
+In the above example, we have applied the `ng-class` attribute directive to an element with some text in the element.
+
+Using a series of check boxes, we check the expression in the check box against the ng-model directive and apply the CSS styling specified in that class.
+
+NOTE: We don't show the CSS file here as this is merely for illustrative purposes. You will apply the use of directives in your labs.
+
+## Angular Lifecycle
+
+Components in Angular have a lifecycle. Angular follows a lifecycle similar in sequence to:
+
+* Create the component
+* Render the component
+* Create/Render any children
+* Process changes in the component (ongoing)
+* Destroy the component
+
+As you can tell from the above list of “lifecycle events”, an Angular application will behave or allow you to interact, at certain times in the lifecycle of the application.
+
+There are some common events, or methods, that you will use to interact your Angular components while your application is bootstrapping, running, and shutting down. You may also see these referred to as lifecycle hooks or component lifecycle hooks.
+
+The three most common methods you will work with are:
+
+* OnInit - used to perform initialization of the component(s) or perhaps retrieve data for the application as it loads.
+
+* OnChanges - used to perform an action after a change of input properties
+
+* OnDestroy - used to clean up the component and resources as the component is being destroyed
+
+## Tutorial Labs
+
+The purpose of these labs is to teach you how to bind dynamic data to a template and manipulate its display. You will learn how to create reusable components to display your data, inject services into them, and render them using Angular's variety of built in tools - including built in pipes and structural directives. We will be taking the service we built in the last module, inject it into a view component, and use it to generate GitHub search results that will be displayed within the component. At the end of the labs, you should be able to construct views and bind them to dynamic data retrieved from a server. 
+
+1. *Creating Components*
+
+In this lab, you will learn how to generate Components using the Angular CLI, and inject and use the service from our previous module. You will then instantiate the component in your main application view.
+
+2. *Creating Templates*
+
+In this lab, you will create a template for your component, bind data from your service to it, and use structural directives to manipulate the display of the data. You will also create and use a component method to make your GitHub search query dynamic.
+
+3. *Using Built-in Pipes and Directives*
+
+In this lab, you will further transform the data using built in Pipes and the ngStyle directive.
+
+
+## To Generate A Component
+
+In this lab, we are going to create a component to display the data obtained from our GitSearch service.
+
+To do so, the first step is to generate a component using the Angular CLI.
+
+1. Open up your terminal or command prompt.
+
+2. Navigate to your angular-fundamentals folder.
+
+3. Type the following command `ng generate component git-search`.
+
+As you can see the generator created a `/src/app/git-search` folder, as well as a `.css`, `.ts`, `.html`, and `.spec.ts` file for `git-search.component`. These files all have their own purpose.
+
+* The `.ts` file contains the TypeScript logic for the component, and is where you would put methods, service integration, and other logic.
+* The `.css` file is automatically injected into your component. You are able to write CSS that is scoped specifically to your component automatically by Angular, without the need to worry about reusing classes.
+* The `.html` file is where you will write your view template.
+* The `.spec.ts` file is where you would potentially write any Karma tests for the component. We won't be covering testing in this course.
+
+In addition, the command also updates the app.module.ts file to ensure the GitSearchComponent is available for use. Note that it is imported and added to the declarations array:
+
+```typescript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { AppComponent } from './app.component';
+import { GitSearchService } from './git-search.service';
+import { GitSearchComponent } from './git-search/git-search.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    GitSearchComponent
+  ],
+  imports: [
+    BrowserModule,
+    HttpClientModule
+  ],
+  providers: [GitSearchService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+And that's it! You now have a component ready to be used.
+
+## To Use a Service
+
+Now that we have our component generated, we are going to inject the service that we created into our component. This will be very similar to what you did when you were working with the `app.component`, except we are going to include an additional method that we will be using later to change the search query dynamically.
+
+1. Open up your `src/app/git-search/git-search.component.ts` file in Visual Studio Code.
+
+2. Import the service into your component by adding an import statement to the top block of code. We also need to import the interface for `GitSearch` that we made in the previous module.
+
+```typescript
+import { GitSearchService } from '../git-search.service'
+import { GitSearch } from '../git-search'
+```
+
+3. Then, go ahead and inject the service in the constructor function.
+
+```typescript
+constructor(private GitSearchService: GitSearchService) { }
+```
+
+4. Let's go ahead and make a variable to hold the search results to convey to the view. To do so, we'll create a type declaration above the constructor for a `searchResults `variable with the type of `GitSearch`.
+
+```typescript
+export class GitSearchComponent implements OnInit {
+  searchResults: GitSearch;
+  constructor(private GitSearchService: GitSearchService) { }
+```
+
+When you declare variable types above a constructor, TypeScript automatically creates a variable scoped to `this`.
+
+5. You'll notice that the `ngOnInit()` lifecycle method has already been created for you. Let's go ahead and add the same code that we had in the `app.component.ts` in the previous module that used the service to display an alert. Open up your app.component.ts and copy the contents of the `ngOnInit()` function, then paste that into the `ngOnInit()` method of `git-search.component.ts`.
+
+```typescript
+ngOnInit() {
+  this.GitSearchService.gitSearch('angular').then((response) => {
+    alert("Total Libraries Found:" + response.total_count);
+  }, (error) => {
+    alert("Error: " + error.statusText)
+  })
+}
+```
+
+Go ahead and empty the `ngOnInit` function in `app.component.ts` like so:
+
+`ngOnInit() { }`
+
+6. Now, let's modify the inner function of `.then()` to store the search response in the `this.searchResults` variable.
+
+```typescript
+ngOnInit() {
+  this.GitSearchService.gitSearch('angular').then((response) => {
+    this.searchResults = results;
+  }, (error) => {
+    alert("Error: " + error.statusText)
+  })
+}
+```
+
+7. Next we are going to make a second method that we can call with a search parameter to send a different query string to the server.
+
+```typescript
+ngOnInit() {
+  this.GitSearchService.gitSearch('angular').then((response) => {
+    this.searchResults = results;
+  }, (error) => {
+    alert("Error: " + error.statusText)
+  })
+}
+
+gitSearch = (query: string) => {
+
+}
+```
+
+8. Let's copy the method from the `ngOnInit()` function, and change `'angular'` to query.
+
+```typescript
+ngOnInit() {
+  this.GitSearchService.gitSearch('angular').then((response) => {
+    this.searchResults = results;
+  }, (error) => {
+    alert("Error: " + error.statusText)
+  })
+}
+
+gitSearch = (query: string) => {
+  this.GitSearchService.gitSearch(query).then((response) => {
+    this.searchResults = results;
+  }, (error) => {
+    alert("Error: " + error.statusText)
+  })
+}
+```
+
+Now we have a function that we can call to search for whatever keyword we want in GitHub.
+
+9. When you're finished, your `git-search.component.ts` should look like this:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { GitSearchService } from '../git-search.service'
+import { GitSearch } from '../git-search'
+@Component({
+  selector: 'app-git-search',
+  templateUrl: './git-search.component.html',
+  styleUrls: ['./git-search.component.css']
+})
+export class GitSearchComponent implements OnInit {
+  searchResults: GitSearch;
+  constructor(private GitSearchService: GitSearchService) { }
+
+  ngOnInit() {
+    this.GitSearchService.gitSearch('angular').then( (response) => {
+      this.searchResults = response;
+    }, (error) => {
+      alert("Error: " + error.statusText)
+    })
+  }
+
+  gitSearch = (query) => {
+    this.GitSearchService.gitSearch(query).then( (response) => {
+      this.searchResults = response;
+    }, (error) => {
+      alert("Error: " + error.statusText)
+    })
+  }
+
+}
+```
+
+So to recap, we have modified this component so that the `GitSearchService` is injected using dependency injection. We modified `ngInit` so that it executes a search for `‘angular’` when the component is initialized, and we have added a function called `gitSearch` that will take an arbitrary query string and perform a search using that value. In our next task we are going to instantiate our new `GitSearchComponent` in our main view component - `app.component.ts`.
