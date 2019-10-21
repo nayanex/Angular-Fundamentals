@@ -1363,7 +1363,7 @@ You'll typically have a top-level component in your Angular application. In the 
 
 This will result in a new folder structure being created in your Angular app's root folder. The folder structure will be `/src/app/git-search` in this instance. Within this folder, a number of files will be created:
 
-1. a typescript file with the .ts extension to contain the logic for the component
+1. a typescript file with the `.ts` extension to contain the logic for the component
 2. a CSS file that is injected into the component for specifying styling using CSS for the component
 3. an HTML file that will contain the view template
 4. a Karma test file with the .spec.ts extension, in the event you want to implement Karma testing
@@ -1462,21 +1462,25 @@ There are four types of binding that we can do in Angular:
 
 ### Interpolation Binding 
 
-Interpolation binding is accomplished using the interpolation syntax, also known as the moustache, where we place the data property into the HTML by using the double curly braces, {{title}}.
+Interpolation binding is accomplished using the interpolation syntax, also known as the moustache, where we place the data property into the HTML by using the double curly braces, `{{title}}`.
 
-<h1>{{title}}</h1>
+`<h1>{{title}}</h1>`
 
 ### Property Binding 
 
 Here is an example of doing the same thing with property binding. Note the syntax is a bit different than you might be used to when dealing with HTML attributes. We use square brackets to surround the HTML attribute, then use the data property in single quotes after the `=` sign.
 
+```html
 <h1 [innerHTML] = 'title'></h1>
+```
 
 ### Event Binding
 
 Event binding is accomplished when we associate an event with a method in our class. For example, we might want to take a specific action in our class when the user clicks a button. In this case, we would use the syntax of"
 
+```html
 <button (click) = 'toggleFlag()'>
+```
 
 In the above code, we surround the click event attribute of the button element in parentheses and supply the method name in our class, that will handle the event, in single quotes.
 
@@ -1484,7 +1488,9 @@ In the above code, we surround the click event attribute of the button element i
 
 Two-way binding allows us to create interactivity or to update our data when the user takes an action with the UI. An example might be a list of products displayed from the data source and then using an input element to allow the user to filter the data displayed based on the value in the input. Sample code here shows using mgModel to achieve two-way binding.
 
+```html
 <input [(ngModel)] = 'filter'>
+```
 
 These are just simple examples of binding properties or methods from our class to an element in the HTML template. We can also make use of various Angular directives and logic to bind multiple values, such as those that might exist in a database, and create tables on the fly to display these values. Angular binding offers an efficient way to display the data in your application. In the lab for this module, you will use simple binding.
 
@@ -1529,9 +1535,9 @@ Structural directives are what you use to modify the layout of the page by manip
 
 ### Structural Directives
 
-As we noted in the introduction to directives topic, structural directives manipulate the HTML layout through the DOM. The manipulation comes in the form of either adding, removing, or changing an element. You know you are using a structural directive if the name is preceded by an asterisk such as *ngIf.
+As we noted in the introduction to directives topic, structural directives manipulate the HTML layout through the DOM. The manipulation comes in the form of either adding, removing, or changing an element. You know you are using a structural directive if the name is preceded by an asterisk such as `*ngIf`.
 
-The *ngIf directive is a built-in directive that comes “out-of-the=box” with Angular. So what do we use it for?
+The `*ngIf` directive is a built-in directive that comes “out-of-the=box” with Angular. So what do we use it for?
 
 Well, the keyword “if” that is contained in the directive should give you some idea. This directive will evaluate a boolean expression and based on the result, it either shows or hides an HTML element, as in the following example.
 
@@ -1590,25 +1596,25 @@ There are some common events, or methods, that you will use to interact your Ang
 
 The three most common methods you will work with are:
 
-* OnInit - used to perform initialization of the component(s) or perhaps retrieve data for the application as it loads.
+* `OnInit` - used to perform initialization of the component(s) or perhaps retrieve data for the application as it loads.
 
-* OnChanges - used to perform an action after a change of input properties
+* `OnChanges` - used to perform an action after a change of input properties
 
-* OnDestroy - used to clean up the component and resources as the component is being destroyed
+* `OnDestroy` - used to clean up the component and resources as the component is being destroyed
 
 ## Tutorial Labs
 
 The purpose of these labs is to teach you how to bind dynamic data to a template and manipulate its display. You will learn how to create reusable components to display your data, inject services into them, and render them using Angular's variety of built in tools - including built in pipes and structural directives. We will be taking the service we built in the last module, inject it into a view component, and use it to generate GitHub search results that will be displayed within the component. At the end of the labs, you should be able to construct views and bind them to dynamic data retrieved from a server. 
 
-1. *Creating Components*
+1. **Creating Components**
 
 In this lab, you will learn how to generate Components using the Angular CLI, and inject and use the service from our previous module. You will then instantiate the component in your main application view.
 
-2. *Creating Templates*
+2. **Creating Templates**
 
 In this lab, you will create a template for your component, bind data from your service to it, and use structural directives to manipulate the display of the data. You will also create and use a component method to make your GitHub search query dynamic.
 
-3. *Using Built-in Pipes and Directives*
+3. **Using Built-in Pipes and Directives**
 
 In this lab, you will further transform the data using built in Pipes and the ngStyle directive.
 
@@ -1632,7 +1638,7 @@ As you can see the generator created a `/src/app/git-search` folder, as well as 
 * The `.html` file is where you will write your view template.
 * The `.spec.ts` file is where you would potentially write any Karma tests for the component. We won't be covering testing in this course.
 
-In addition, the command also updates the app.module.ts file to ensure the GitSearchComponent is available for use. Note that it is imported and added to the declarations array:
+In addition, the command also updates the `app.module.ts` file to ensure the `GitSearchComponent` is available for use. Note that it is imported and added to the declarations array:
 
 ```typescript
 import { BrowserModule } from '@angular/platform-browser';
@@ -1789,3 +1795,384 @@ export class GitSearchComponent implements OnInit {
 ```
 
 So to recap, we have modified this component so that the `GitSearchService` is injected using dependency injection. We modified `ngInit` so that it executes a search for `‘angular’` when the component is initialized, and we have added a function called `gitSearch` that will take an arbitrary query string and perform a search using that value. In our next task we are going to instantiate our new `GitSearchComponent` in our main view component - `app.component.ts`.
+
+# To Instantiate a Component
+
+Now that we have our component created and hooked up to our service, we need to instantiate it in our main view, contained within `app.component.ts`. Components can be used throughout a module without having to import them into other components.
+
+1. First, let's open up your `app.module.ts` file in Visual Studio Code.
+
+2. Your `app.module.ts` file should look like this:
+
+```typescript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { AppComponent } from './app.component';
+import { GitSearchService } from './git-search.service';
+import { GitSearchComponent } from './git-search/git-search.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    GitSearchComponent
+  ],
+  imports: [
+    BrowserModule,
+    HttpClientModule
+  ],
+  providers: [GitSearchService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+You can see that `GitSearchComponent` is imported at the top, and has been added to the declarations array. Every component must be imported into one (and only one) `@NgModule` and the declarations array contains the list of all components available within that module. As this module represents the application, this ensure the `AppComponent` and `GitSearchComponent` components are available throughout the application. There's nothing more to do in this file, we are just verifying that the component has been properly configured by the Angular CLI.
+
+3. Next, let's go back to our `git-search/git-search.component.ts` file. At the top of the file, you will notice this section.
+
+```typescript
+@Component({
+  selector: 'app-git-search',
+  templateUrl: './git-search.component.html',
+  styleUrls: ['./git-search.component.css']
+})
+```
+
+This is the component declaration. It has three properties, `selector`, `templateUrl` and `styleUrls`. There are more options available, but these are the most commonly used options for `@Component`. The templateUrl and styleUrls properties point to external files where the template and its respective CSS content are stored. You will note that the `styleUrls` is an array, meaning you can reference more than one stylesheet.
+
+It is also worth noting that you can elect to include `HTML` and `CSS` directly within the `git-search.component.ts` file by using the template and styles properties instead. You should only do this if your HTML and CSS is trivial and, even then, separate files are a best practice. This is what inline HTML and CSS would look like (don't update your source - this is just for your reference):
+
+```typescript
+@Component({
+  selector: 'app-git-search',
+  template: `
+    <p>
+      git-search works!
+    </p>`,
+  styles: ['p { background: red; }']
+})
+```
+
+The selector field is what we are interested in right now, as it contains the tag name (or element name) that identifies the component when used in a template. As you can see, `app-git-search` is the `selector` for the `GitSearchComponent`. Whenever Angular sees `<app-git-search></app-git-search>` in a template, it will replace that with the `GitSearchComponent` template. Let's remember that, we'll need it in a moment.
+
+4. Open up your `app.component.html` file. Go ahead and delete all of the html and replace it with:
+
+```html
+<div style="text-align:center">
+</div>
+```
+
+5. Remember the selector attribute from the `@Component` declaration? We're going to use that as though it were an HTML tag name to instantiate the component.
+
+```html
+<div style="text-align:center">
+  <app-git-search>
+  </app-git-search>
+</div>
+```
+
+Note that we included a closing tag. Angular components can't be self-closed like an `<img />` tag or `<input />` tag. They must include both.
+
+Go ahead and open a command prompt or terminal, and navigate to your angular-fundamentals directory.
+
+Use the command `ng serve`.
+
+Open your browser and point it to `localhost:4200` and you should see the following.
+
+![alt text](https://prod-edxapp.edx-cdn.org/assets/courseware/v1/3639090caed873ae2c421bdaa96c02f9/asset-v1:Microsoft+DEV314x+1T2019a+type@asset+block/M3L7result.png)
+
+You have now created and instantiated your first Angular component. 
+
+## To Bind Data to Templates
+
+Now we are going to create the template to drive the display of our `GitSearch` data. An Angular Template is essentially an HTML file, but through Angular we are able to bind data from our component logic directly to the HTML, and use other features such as pipes, directives, and other components.
+
+In this lab, we are going to create a template for our component that holds the display results from our `GitSearchService`.
+
+1. Open up the `src/app/git-search/git-search.component.html` file in Visual Studio Code. It will look like this:
+
+```html
+<p>
+  git-search works!
+</p>
+```
+
+2. First we are going to bind a simple value to our application, so we are going to use the total number of repositories returned from the search. Go ahead and open your `src/app/git-search.ts` file to take a look at the interface so you can remember what the shape of the output is going to look like.
+
+```typescript
+export interface GitSearch {
+  "total_count": number,
+  "incomplete_results": boolean,
+  "items": Array<
+{
+```
+
+Notice that the first few values include the one we are looking for: `total_count`. Let's remember that key for now.
+
+3. In the previous lab, we created a value in our `git-search.component.ts` file to store the search results when they come back from the server. If you don't recall, go ahead and open up your `git-search.component.ts` file and take a look.
+
+```typescript
+export class GitSearchComponent implements OnInit {
+  searchResults: GitSearch;
+  constructor(private GitSearchService: GitSearchService) { }
+
+  ngOnInit() {
+    this.GitSearchService.gitSearch('angular').then( (response) => {
+      console.log(response)
+      this.searchResults = response;
+    }, (error) => {
+      alert("Error: " + error.statusText)
+    })
+}
+```
+
+As you can see, we made the `this.searchResults` variable to hold the search results. Variables scoped to this in your component logic are made available for your templates to consume. In order to do this, we use the double-curly-braces syntax. So to access this.searchResults we would use `{{searchResults}}` in our template. So you will use interpolation to directly insert the value of a variable into text or as the value for an attribute.
+
+4. Since we are wanting to display the total number of results that the search returned, we are going to use the property we referenced from the interface - `total_count` - in our `searchResults` variable. Let's also throw in a label to identify what the piece of data being displayed:
+
+```html
+<h3>Total Results: {{searchResults.total_count}}</h3>
+<p>
+  git-search works!
+</p>
+```
+
+5. We don't need the `<p>` tag indicating that the component works anymore, so let's get rid of it.
+
+```html
+<h3>Total Results: {{searchResults.total_count}}</h3>
+```
+
+6. Open up a browser and navigate to `l`ocalhost:4200`. You should see the following:
+
+![alt text](https://prod-edxapp.edx-cdn.org/assets/courseware/v1/4f27d842caf444205763f04f030f1ea4/asset-v1:Microsoft+DEV314x+1T2019a+type@asset+block/result1.png)
+
+As you can see, we've successfully bound a value from our `searchResults` to our HTML display. 
+
+## To Use Structural Directives ngIf and ngForOf
+
+Directives are basically commands issued to Angular to run specific processes on data or template displays. Structural directives are directives that change the structure of your template. The two most commonly used structural directives are `ngIf` and `ngFor`. `ngIf` allows you to conditionally render a portion of your template based upon the truthiness of a specific value in your component logic. `ngFor` is a repeater directive that allows you to execute a portion of your template in a repeated fashion for each item in an array, and provides the context of the specific index in the array to the instance of the repeater. These two tools are the most useful and fundamental pieces for constructing a web application view.
+
+In this task, we are going to use ngFor to iterate over each result in our `searchResults` variable, and display some information from it. Then we are going to use our ngIf directive to only render our results when the results have become available, and to display an indicator that the results are loading otherwise.
+
+1. First we need to ascertain some relevant data to display from our search results. Let's take a look at our interface again. If you don't still have it open, open up your `src/app/git-search.ts` file.
+
+You will see there is a property items that is an array. The Angular way to display this data is we are going to want to repeat the same chunk of HTML for each item in the items array and we are going to use Angular data binding to show the data that is contained in each item. The `GitSearch` interface defines a lot of properties, but to make things easier we're going to pick a couple of keys to display, in this case `name`, `description`, `html_url`, `owner.login`, and `owner.avatar_url`.
+
+2. If you don't still have it open, open up your `git-search.component.html` file in Visual Studio Code.
+
+3. Before we use our structural directive, let's make the template item that we're going to repeat. We are going to use the HTML unordered list element `<ul>` to start our list of items. Each of our items will then be represented within a list item element `<li>`. As we are going to be using binding we need to think about the variable names we are going to use. When we initiate the repeater, we are going to be setting an instance variable name that will represent each item in the array. In this case we are going to use result, so we are going to use that as the basis for each of our bindings.
+
+```html
+<h3>Total Results: {{searchResults.total_count}}</h3>
+<ul>
+  <li>
+    <a [href]="result.html_url">
+      <img [src]="result.owner.avatar_url" /> 
+      <h4>{{result.name}} 
+        <small> by {{result.owner.login}}</small> 
+      </h4>
+    </a> 
+    <p> {{result.description}}</p> 
+  </li>
+</ul>
+```
+
+There are a few things to note here:
+
+* An example of a variable we are binding to is `result.owner.avatar_url` - this will work as we will be assigning an item to result. If you refer back to the `GitSearch` interface, you will see that each item in the `items` array has an `owner` property and each `owner` has an `avatar_url`.
+* There are some unusual looking attributes in the HTML: `[src]` in the image link and the `[href]` in the `<a>` tag. In fact Angular uses the `[src]` directive instead of the regular src attribute in HTML when using a value instead of a static string, likewise with the `[href]` attribute in the case of links.
+* Not all of the bindings are using the interpolation syntax `{{}}` - we don't use interpolation when we are binding in a directive.
+
+4. Now that we have our basic template for our repeater rigged up, let's go ahead and instantiate the `ngFor` directive on our `<li>` element.
+
+```html
+<h3>Total Results: {{searchResults.total_count}}</h3>
+<ul>
+  <li *ngFor="let result of searchResults.items" >
+    <a [href]="result.html_url">
+      <img [src]="result.owner.avatar_url" /> 
+      <h4>{{result.name}} 
+        <small> by {{result.owner.login}}</small> 
+      </h4>
+    </a> 
+    <p> {{result.description}}</p> 
+  </li>
+</ul>
+```
+
+Note that we have instantiated this for the items property of `searchResults`. The `ngFor` directive can only be used on iterable collections such as arrays, it cannot be used on objects directly. The syntax essentially reads as "for every item in `searchResults.items` assign the value to result and then repeat the `<li><\li>` element and it's children using the value of result in the bindings. I think you will agree, it is more succinct to type `<li *ngFor=“let result of searchResults.items” >`.
+
+5. Save your file. If you don't have your app running already, go ahead and open a command prompt or terminal, navigate to your angular-fundamentals folder, and type ng serve. Otherwise, just proceed directly to the next step.
+
+6. Open up your browser and point it to `localhost:4200` and you should see something like this after a moment:
+
+![alt text](https://prod-edxapp.edx-cdn.org/assets/courseware/v1/e2e530425915e6a073dfdcafb6abe52e/asset-v1:Microsoft+DEV314x+1T2019a+type@asset+block/result2.png)
+
+As you can see, results are now populating on your screen.
+
+7. If you use the developer tools for your particular browser and open up the JavaScript console, you'll notice there are some errors with what's happening right now.
+
+![alt text](https://prod-edxapp.edx-cdn.org/assets/courseware/v1/79abf64f082e426fbe18ca44a56ecae6/asset-v1:Microsoft+DEV314x+1T2019a+type@asset+block/errors.png)
+
+This is occurring because Angular is trying to read from the items array when there is no response currently present. In order to solve for this problem, we are going to use the ngIf directive to only show this entire template when the `searchResults` data is available.
+
+8. Let's wrap the entirety of our current template, including the header with the total count of results, in a `<div>` and apply the `ngIf` directive to it.
+
+```html
+<div *ngIf="searchResults;">
+  <h3>Total Results: {{searchResults.total_count}}</h3>
+  <ul>
+    <li *ngFor="let result of searchResults.items">
+      <a [href]="result.html_url">
+        <img [src]="result.owner.avatar_url" /> 
+        <h4>{{result.name}} 
+          <small> by {{result.owner.login}}</small> 
+        </h4>
+      </a> 
+      <p> {{result.description}}</p> 
+    </li>
+  </ul>
+</div>
+```
+
+This will make the whole block only render once `searchResults` is available, eliminating the error we saw previously.
+
+9. One of the features of ngIf is the ability to include a template to be used in the inverse condition of the `ngIf`, essentially an else to ngIf. In order to do this, add an else statement with a hashed ID after the first statement in `ngIf`, then apply that hashed ID to an `ng-template` tag after your initial block.
+
+```html
+<div *ngIf="searchResults; else elseBlock">
+  <h3>Total Results: {{searchResults.total_count}}</h3>
+  <ul>
+    <li *ngFor="let result of searchResults.items">
+      <a [href]="result.html_url">
+        <img [src]="result.owner.avatar_url" /> 
+        <h4>{{result.name}} 
+          <small> by {{result.owner.login}}</small> 
+        </h4>
+      </a> 
+      <p> {{result.description}}</p> 
+    </li>
+  </ul>
+</div>
+<ng-template #elseBlock>Loading...</ng-template>
+```
+
+You can nest any HTML you'd like within the else block, we are just using the text "Loading…".
+
+**Note:** some connections may be too quick to see the “loading…” string before the data is displayed.
+
+That's it! You've successfully used Structural Directives to shape the way your template is built. 
+
+## To Use CSS and ngStyle
+
+Now that we have our template created and displaying data, it's time for us to add a bit of style to it. To do this we are going to use two different tools: the scoped CSS file linked to our template and the ngStyle built in directive.
+
+1. First we need to apply some css classes to the HTML in our template. Go ahead and open up the `git-search.component.html` file in Visual Studio Code. 
+
+2. Let's add a **total** class to the `<h3>` tag, a **list** class to the `<ul>` tag, a **list_item** class to the `<li>` tag, an **avatar** class to the `<img>` tag, a **title** class to the `<h4>` tag, and finally a description class to the `<p>` tag.
+
+```html
+<div *ngIf="searchResults; else elseBlock">
+  <h3 class="total">Total Results: {{searchResults.total_count}}</h3>
+  <ul class="list">
+    <li class="list_item" *ngFor="let result of searchResults.items">
+      <a [href]="result.html_url">
+        <img class="avatar" [src]="result.owner.avatar_url" /> 
+        <h4 class="title">{{result.name}} 
+          <small> by {{result.owner.login}}</small> 
+        </h4>
+      </a> 
+      <p class="description"> {{result.description}}</p> 
+    </li>
+  </ul>
+</div>
+<ng-template #elseBlock>Loading...</ng-template>
+```
+
+We will use these classes to apply styles to the HTML elements.
+
+3. Now let's open up our `git-search.component.css` file. You can see that it is currently empty. CSS that we add into this file will automatically be injected into our component, and will also be specifically scoped to it - which means that even if you use similar classes or element rules across multiple component CSS files, they will not overlap.
+
+4. Let's add some styles to this file. Go ahead and copy the CSS below and paste it into your file.
+
+```css
+.total {
+    font-size:24px;
+}
+.list {
+    list-style-type: none;
+}
+.list_item {
+    border:1px solid black;
+    height: 165px;
+    margin-top: 20px;
+    padding-top: 10px;
+    padding-left: 10px;
+}
+.avatar {
+    width:150px;
+    height:150px;
+    float:left;
+}
+.title {
+    font-size:20px;
+}
+.description {
+    font-size:18px;
+}
+```
+
+5. Next we're going to use `ngStyle` to apply a style to your template conditionally. First we want to add the index property to our `ngFor` so we can use the `index` in our `ngStyle`. To do that, add an i`ndex as i;` statement after your `let result of searchResults.items;` statement. The outcome of this statement is that the variable `i` will be set to `0` the first time through the loop, then incremented to `1` and so on.
+
+```html
+<div *ngIf="searchResults; else elseBlock">
+  <h3 class="total">Total Results: {{searchResults.total_count}}</h3>
+  <ul class="list">
+    <li class="list_item" *ngFor="let result of searchResults.items; index as i;">
+      <a [href]="result.html_url">
+        <img class="avatar" [src]="result.owner.avatar_url" /> 
+        <h4 class="title">{{result.name}} 
+          <small> by {{result.owner.login}}</small> 
+        </h4>
+      </a> 
+      <p class="description"> {{result.description}}</p> 
+    </li>
+  </ul>
+</div>
+<ng-template #elseBlock>Loading...</ng-template>
+```
+
+Note the semicolons separating the statements. This is important when using multiple statements in the same directive such as `ngFor`.
+
+6. Now that we have the `index`, let's apply a style that will vary the background color based on if the row is even or odd. To do this, we add an object to the `ngStyle `directive on our `<li>` tag.
+
+```html
+<div *ngIf="searchResults; else elseBlock">
+  <h3 class="total">Total Results: {{searchResults.total_count}}</h3>
+  <ul class="list">
+    <li [ngStyle]="{'background-color' : (i % 2 === 0) ? 'silver' : 'white'}" class="list_item" *ngFor="let result of searchResults.items; index as i;">
+      <a [href]="result.html_url">
+        <img class="avatar" [src]="result.owner.avatar_url" /> 
+        <h4 class="title">{{result.name}} 
+          <small> by {{result.owner.login}}</small> 
+        </h4>
+      </a> 
+      <p class="description"> {{result.description}}</p> 
+    </li>
+  </ul>
+</div>
+<ng-template #elseBlock>Loading...</ng-template>
+```
+
+Note that there's a ternary expression for the value of `background-color`. Values set in `ngStyle` can be in the form of a JavaScript expression, and the ternary is a good way to set up a quick two-way switch based on a variable, in this case switching on whether the modulus of the index of the repeated element when divided by 2 is 0 (indicating an even number).
+
+5. Save the file, and then, if your app is not already running: open up your terminal or command prompt, navigate to your `angular-fundamentals` folder, and use `ng serve` to start your app.
+
+Open up a browser and navigate to `localhost:4200` and you should see the following.
+
+![alt text](https://prod-edxapp.edx-cdn.org/assets/courseware/v1/89a91c812767cf4ce07e5f7fe5aeb5c4/asset-v1:Microsoft+DEV314x+1T2019a+type@asset+block/result3.png)
+
+And there you have it! You have successfully applied styles using the scoped component CSS and the built-in directive ngStyle.
+
