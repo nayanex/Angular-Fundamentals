@@ -2176,3 +2176,82 @@ Open up a browser and navigate to `localhost:4200` and you should see the follow
 
 And there you have it! You have successfully applied styles using the scoped component CSS and the built-in directive ngStyle.
 
+## To Use Built In Pipes
+
+In this lab, we are going to do two things: apply built-in Pipes to our Angular template to further transform the data output, and use the `ngModel` built-in directive to create a search input for our application to be able to send custom queries.
+
+We are going to work with a couple of built-in Pipes in Angular: the `date` pipe and the `uppercase` pipe.
+
+1. Open up your `src/app/git-search/git-search.component.html` file in Visual Studio Code. 
+
+2. Next we are going to add an additional field from the `GitSearch` output, `created_at`, below the description.
+
+```html
+<div *ngIf="searchResults; else elseBlock">
+  <h3 class="total">Total Results: {{searchResults.total_count}}</h3>
+  <ul class="list">
+    <li [ngStyle]="{'background-color' : (i % 2 === 0) ? 'silver' : 'white'}" class="list_item" *ngFor="let result of searchResults.items; index as i;">
+      <a [href]="result.html_url">
+        <img class="avatar" [src]="result.owner.avatar_url" /> 
+        <h4 class="title">{{result.name}} 
+          <small> by {{result.owner.login}}</small> 
+        </h4>
+      </a> 
+      <p class="description"> {{result.description}}</p>
+      <p> Created On: {{result.created_at}} </p>
+    </li>
+  </ul>
+</div>
+<ng-template #elseBlock>Loading...</ng-template>
+```
+
+3. Now we are going to apply a `date` pipe to our `result.created_at` binding. To do so, you add the pipe or `|` character after your binding, followed by the pipe command, which in this case will be `date:'fullDate'` to indicate that we want to format this as a full date.
+
+```html
+<div *ngIf="searchResults; else elseBlock">
+  <h3 class="total">Total Results: {{searchResults.total_count}}</h3>
+  <ul class="list">
+    <li [ngStyle]="{'background-color' : (i % 2 === 0) ? 'silver' : 'white'}" class="list_item" *ngFor="let result of searchResults.items; index as i;">
+      <a [href]="result.html_url">
+        <img class="avatar" [src]="result.owner.avatar_url" /> 
+        <h4 class="title">{{result.name}} 
+          <small> by {{result.owner.login}}</small> 
+        </h4>
+      </a> 
+      <p class="description"> {{result.description}}</p> 
+      <p> Created On: {{result.created_at | date:'fullDate'}} </p>
+    </li>
+  </ul>
+</div>
+<ng-template #elseBlock>Loading...</ng-template>
+```
+
+4. Now let's add an uppercase pipe to our repository owner's names in the same fashion, by adding a `|` followed by `uppercase` after the template binding.
+
+```html
+<div *ngIf="searchResults; else elseBlock">
+  <h3 class="total">Total Results: {{searchResults.total_count}}</h3>
+  <ul class="list">
+    <li [ngStyle]="{'background-color' : (i % 2 === 0) ? 'silver' : 'white'}" class="list_item" *ngFor="let result of searchResults.items; index as i;">
+      <a [href]="result.html_url">
+        <img class="avatar" [src]="result.owner.avatar_url" /> 
+        <h4 class="title">{{result.name}} 
+          <small> by {{result.owner.login | uppercase}}</small> 
+        </h4>
+      </a> 
+      <p class="description"> {{result.description}}</p> 
+      <p> Created On: {{result.created_at | date:'fullDate'}} </p>
+    </li>
+  </ul>
+</div>
+<ng-template #elseBlock>Loading...</ng-template>
+```
+
+5. Save the file, and then, if your app is not already running: open up your terminal or command prompt, navigate to your angular-fundamentals folder, and use `ng serve` to start your app.
+
+6. Open up a browser and navigate to `localhost:4200` and you should see the following.
+
+![alt text](https://prod-edxapp.edx-cdn.org/assets/courseware/v1/e0b559bd8f0cf593a7c8f40816e27b13/asset-v1:Microsoft+DEV314x+1T2019a+type@asset+block/M3L9result1.png)
+
+Congratulations! You have implemented Pipes in your templates. You can see that the date is now formatted properly, and that the user's name is capitalized.
+
