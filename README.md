@@ -2255,3 +2255,147 @@ We are going to work with a couple of built-in Pipes in Angular: the `date` pipe
 
 Congratulations! You have implemented Pipes in your templates. You can see that the date is now formatted properly, and that the user's name is capitalized.
 
+## To Create a Search with ngModel
+
+For our final task in this module, we are going to be implementing a real search in our application using an input field and a built in directive called `ngModel`. `ngModel` allows you to set up a variable in your component logic that will be bound to your view. `ngModel` can be configured to work both one-way (where changes to the component's model will reflect into the view automatically) or two way (where changes to the input field by the user will also reflect back into the component's model). This is used primarily in input forms, and can be used for simple forms or larger ones.
+
+1. Open up your `src/app/app.module.ts` file. 
+
+2. We need to import the `FormsModule` and `ReactiveFormsModule` to be able to use `ngModel`. Add them to the import block, and then add `FormsModule` to the imports array in the `@NgModule` declaration.
+
+```typescript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { AppComponent } from './app.component';
+import { GitSearchService } from './git-search.service';
+import { GitSearchComponent } from './git-search/git-search.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    GitSearchComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpClientModule
+  ],
+  providers: [GitSearchService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+3. Open up your `src/app/git-search/git-search.component.ts` file. It should look like this at this point:
+
+4. We need to add another variable to capture the search query. Let's add the type declaration right above the constructor:
+
+```typescript
+searchResults: GitSearch;
+searchQuery: string;
+constructor(private GitSearchService: GitSearchService) { }
+```
+
+5. We also need to change our `gitSearch` method to use this value instead of passing one into the function:
+
+```typescript
+gitSearch = () => {
+    this.GitSearchService.gitSearch(this.searchQuery).then( (response) => {
+      this.searchResults = response;
+    }, (error) => {
+      alert("Error: " + error.statusText)
+    })
+}
+```
+
+6. Next, we need to open our `src/app/git-search/git-search.component.html` template file.
+
+7. Next, above of our `<div>` with the `ngIf` declaration applied, we are going to add an input field and a button.
+
+```html
+<input name="query" placeholder="Enter Search Here" />
+<button>Submit</button>
+<div *ngIf="searchResults; else elseBlock">
+  <h3 class="total">Total Results: {{searchResults.total_count}}</h3>
+  <ul class="list">
+    <li [ngStyle]="{'background-color' : (i % 2 === 0) ? 'silver' : 'white'}" class="list_item" *ngFor="let result of searchResults.items; index as i;">
+      <a [href]="result.html_url">
+        <img class="avatar" [src]="result.owner.avatar_url" /> 
+        <h4 class="title">{{result.name}} 
+          <small> by {{result.owner.login | uppercase}}</small> 
+        </h4>
+      </a> 
+      <p class="description"> {{result.description}}</p> 
+      <p> Created On: {{result.created_at | date:'fullDate'}} </p>
+    </li>
+  </ul>
+</div>
+<ng-template #elseBlock>Loading...</ng-template>
+```
+
+8. Next we are going to apply the `ngModel` directive to our input field. We are going to use the two-way binding configuration so that changes to the input are reflected in the model. To do this, you use what's known as the “banana-in-a-box” syntax `[(ngModel)]=`.
+
+```html
+<input name="query" placeholder="Enter Search Here" [(ngModel)]="searchQuery" />
+<button>Submit</button>
+<div *ngIf="searchResults; else elseBlock">
+  <h3 class="total">Total Results: {{searchResults.total_count}}</h3>
+  <ul class="list">
+    <li [ngStyle]="{'background-color' : (i % 2 === 0) ? 'silver' : 'white'}" class="list_item" *ngFor="let result of searchResults.items; index as i;">
+      <a [href]="result.html_url">
+        <img class="avatar" [src]="result.owner.avatar_url" /> 
+        <h4 class="title">{{result.name}} 
+          <small> by {{result.owner.login | uppercase}}</small> 
+        </h4>
+      </a> 
+      <p class="description"> {{result.description}}</p> 
+      <p> Created On: {{result.created_at | date:'fullDate'}} </p>
+    </li>
+  </ul>
+</div>
+<ng-template #elseBlock>Loading...</ng-template>
+```
+
+9. Next, we need to add an event handler for our button to execute the search. To do this, we need to use the event handler `(click)=`.
+
+```html
+<button (click)="gitSearch()">Submit</button>
+```
+
+This binds a specific function to the click event on this button. Other event handlers exist such as `mouseenter`, `keypress`, or `keyup`, and they share the same format.
+
+10. Your template file should now look like this:
+
+```html
+<input name="query" placeholder="Enter Search Here" [(ngModel)]="searchQuery" />
+<button (click)="gitSearch()">Submit</button>
+<div *ngIf="searchResults; else elseBlock">
+  <h3 class="total">Total Results: {{searchResults.total_count}}</h3>
+  <ul class="list">
+    <li [ngStyle]="{'background-color' : (i % 2 === 0) ? 'silver' : 'white'}" class="list_item" *ngFor="let result of searchResults.items; index as i;">
+      <a [href]="result.html_url">
+        <img class="avatar" [src]="result.owner.avatar_url" /> 
+        <h4 class="title">{{result.name}} 
+          <small> by {{result.owner.login | uppercase}}</small> 
+        </h4>
+      </a> 
+      <p class="description"> {{result.description}}</p> 
+      <p> Created On: {{result.created_at | date:'fullDate'}} </p>
+    </li>
+  </ul>
+</div>
+<ng-template #elseBlock>Loading...</ng-template>
+```
+
+11. Open up a browser and navigate to `localhost:4200` and you should see the following.
+
+![alt text](https://prod-edxapp.edx-cdn.org/assets/courseware/v1/6c2f6e7a6c4eab76778ef074c2fc4a05/asset-v1:Microsoft+DEV314x+1T2019a+type@asset+block/M3L9result2.png)
+
+12. Enter `‘ng’` into your search bar and hit 'submit' to see the following:
+
+![alt text](https://prod-edxapp.edx-cdn.org/assets/courseware/v1/7a7dd517f3e0a090bf07e9e6465feaac/asset-v1:Microsoft+DEV314x+1T2019a+type@asset+block/M3L9result3.png
+
+Congratulations! Your Git Search app is now functional. 
+
